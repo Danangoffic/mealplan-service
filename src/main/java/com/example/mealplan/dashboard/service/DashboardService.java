@@ -1,0 +1,98 @@
+package com.example.mealplan.dashboard.service;
+
+import com.example.mealplan.common.util.SecurityUtils;
+import com.example.mealplan.dashboard.dto.DailyProgressResponse;
+import com.example.mealplan.dashboard.dto.WeeklyProgressResponse;
+import com.example.mealplan.mealentry.entity.MealEntry;
+import com.example.mealplan.mealentry.entity.MealStatus;
+import com.example.mealplan.mealentry.repository.MealEntryRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@Service
+public class DashboardService {
+
+    private final MealEntryRepository mealEntryRepository;
+
+    public DashboardService(MealEntryRepository mealEntryRepository) {
+        this.mealEntryRepository = mealEntryRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public DailyProgressResponse getDailyProgress(LocalDate date) {
+        String email = SecurityUtils.getCurrentUserEmail();
+        List<MealEntry> entries = mealEntryRepository.findByMealPlanUserEmailAndMealPlanPlanDate(email, date);
+
+        int totalMeals = entries.size();
+        int completedMeals = 0;
+        int skippedMeals = 0;
+        int pendingMeals = 0;
+
+        for (MealEntry entry : entries) {
+            if (entry.getStatus() == MealStatus.COMPLETED) {
+                completedMeals++;
+            } else if (entry.getStatus() == MealStatus.SKIPPED) {
+                skippedMeals++;
+            } else if (entry.getStatus() == MealStatus.PENDING) {
+                pendingMeals++;
+            }
+        }
+
+        double completionRate = 0.0;
+        if (totalMeals > 0) {
+            completionRate = ((double) completedMeals / totalMeals) * 100;
+            // Round to nearest integer or 2 decimal places. Let's round to 2 decimal places.
+            completionRate = Math.round(completionRate * 100.0) / 100.0;
+        }
+
+        return DailyProgressResponse.builder()
+                .date(date)
+                .totalMeals(totalMeals)
+                .completedMeals(completedMeals)
+                .skippedMeals(skippedMeals)
+                .pendingMeals(pendingMeals)
+                .completionRate(completionRate)
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public WeeklyProgressResponse getWeeklyProgress(LocalDate startDate, LocalDate endDate) {
+        String email = SecurityUtils.getCurrentUserEmail();
+        List<MealEntry> entries = mealEntryRepository.findByMealPlanUserEmailAndMealPlanPlanDateBetween(email, startDate, endDate);
+
+        int totalMeals = entries.size();
+        int completedMeals = 0;
+        int skippedMeals = 0;
+        int pendingMeals = 0;
+
+        for (MealEntry entry : entries) {
+            if (entry.getStatus() == MealStatus.COMPLETED) {
+                completedMeals++;
+            } else if (entry.getStatus() == MealStatus.SKIPPED) {
+                skippedMeals++;
+            } else if (entry.getStatus() == MealStatus.PENDING) {
+                pendingMeals++;
+            }
+        }
+
+        double completionRate = 0.0;
+        if (totalMeals > 0) {
+            completionRate = ((double) completedMeals / totalMeals) * 100;
+            // Round to 2 decimal places
+            completionRate = Math.round(completionRate * 100.0) / 100.0;
+        }
+
+        return WeeklyProgressResponse.builder()
+                .startDate(startDate)
+                .endDate(endDate)
+                .totalMeals(totalMeals)
+                .completedMeals(completedMeals)
+                .skippedMeals(skippedMeals)
+                .pendingMeals(pendingMeals)
+                .completionRate(completionRate)
+                .build();
+    }
+}

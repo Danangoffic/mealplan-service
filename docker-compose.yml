@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: meal_plan_mysql
+    environment:
+      MYSQL_DATABASE: meal_plan_db
+      MYSQL_USER: mealplan_user
+      MYSQL_PASSWORD: mealplan_password
+      MYSQL_ROOT_PASSWORD: root_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "mealplan_user", "-pmealplan_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: meal_plan_app
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: meal_plan_db
+      DB_USERNAME: mealplan_user
+      DB_PASSWORD: mealplan_password
+      JWT_SECRET: change-this-secret-key-to-a-secure-secret-and-make-it-long-enough-for-hs256-algorithms-to-work-properly-with-spring-security
+      JWT_EXPIRATION: 86400000
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
