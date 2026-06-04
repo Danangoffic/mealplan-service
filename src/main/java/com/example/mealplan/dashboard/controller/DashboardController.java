@@ -1,6 +1,7 @@
 package com.example.mealplan.dashboard.controller;
 
 import com.example.mealplan.common.response.ApiResponse;
+import com.example.mealplan.common.util.SecurityUtils;
 import com.example.mealplan.dashboard.dto.DailyProgressResponse;
 import com.example.mealplan.dashboard.dto.WeeklyProgressResponse;
 import com.example.mealplan.dashboard.service.DashboardService;
@@ -26,7 +27,8 @@ public class DashboardController {
     @GetMapping("/daily")
     public ResponseEntity<ApiResponse<DailyProgressResponse>> getDailyProgress(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        DailyProgressResponse response = dashboardService.getDailyProgress(date);
+        String email = SecurityUtils.getCurrentUserEmail();
+        DailyProgressResponse response = dashboardService.getDailyProgress(email, date);
         return ResponseEntity.ok(ApiResponse.success("Daily progress retrieved successfully", response));
     }
 
@@ -34,7 +36,8 @@ public class DashboardController {
     public ResponseEntity<ApiResponse<WeeklyProgressResponse>> getWeeklyProgress(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate) {
-        WeeklyProgressResponse response = dashboardService.getWeeklyProgress(startDate, endDate);
+        String email = SecurityUtils.getCurrentUserEmail();
+        WeeklyProgressResponse response = dashboardService.getWeeklyProgress(email, startDate, endDate);
         return ResponseEntity.ok(ApiResponse.success("Weekly progress retrieved successfully", response));
     }
 }

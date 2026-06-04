@@ -11,6 +11,7 @@ import com.example.mealplan.mealentry.entity.MealStatus;
 import com.example.mealplan.mealentry.repository.MealEntryRepository;
 import com.example.mealplan.mealplan.entity.MealPlan;
 import com.example.mealplan.mealplan.repository.MealPlanRepository;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +27,7 @@ public class MealEntryService {
     }
 
     @Transactional
+    @CacheEvict(value = {"dailyProgress", "weeklyProgress"}, allEntries = true)
     public MealEntryResponse addMealEntry(Long mealPlanId, MealEntryRequest request) {
         String email = SecurityUtils.getCurrentUserEmail();
         MealPlan mealPlan = mealPlanRepository.findById(mealPlanId)
@@ -51,6 +53,7 @@ public class MealEntryService {
     }
 
     @Transactional
+    @CacheEvict(value = {"dailyProgress", "weeklyProgress"}, allEntries = true)
     public MealEntryResponse updateMealEntry(Long id, MealEntryRequest request) {
         String email = SecurityUtils.getCurrentUserEmail();
         MealEntry entry = mealEntryRepository.findById(id)
@@ -72,6 +75,7 @@ public class MealEntryService {
     }
 
     @Transactional
+    @CacheEvict(value = {"dailyProgress", "weeklyProgress"}, allEntries = true)
     public MealEntryResponse updateMealStatus(Long id, MealStatus status) {
         String email = SecurityUtils.getCurrentUserEmail();
         MealEntry entry = mealEntryRepository.findById(id)
@@ -87,6 +91,7 @@ public class MealEntryService {
     }
 
     @Transactional
+    @CacheEvict(value = {"dailyProgress", "weeklyProgress"}, allEntries = true)
     public void deleteMealEntry(Long id) {
         String email = SecurityUtils.getCurrentUserEmail();
         MealEntry entry = mealEntryRepository.findById(id)

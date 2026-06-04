@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,6 +41,7 @@ public class MealPlanService {
     }
 
     @Transactional
+    @CacheEvict(value = {"dailyProgress", "weeklyProgress"}, allEntries = true)
     public MealPlanResponse createMealPlan(MealPlanRequest request) {
         String email = SecurityUtils.getCurrentUserEmail();
         User user = userRepository.findByEmail(email)
@@ -91,6 +93,7 @@ public class MealPlanService {
     }
 
     @Transactional
+    @CacheEvict(value = {"dailyProgress", "weeklyProgress"}, allEntries = true)
     public MealPlanResponse updateMealPlan(Long id, MealPlanRequest request) {
         String email = SecurityUtils.getCurrentUserEmail();
         MealPlan mealPlan = mealPlanRepository.findById(id)
@@ -117,6 +120,7 @@ public class MealPlanService {
     }
 
     @Transactional
+    @CacheEvict(value = {"dailyProgress", "weeklyProgress"}, allEntries = true)
     public void deleteMealPlan(Long id) {
         String email = SecurityUtils.getCurrentUserEmail();
         MealPlan mealPlan = mealPlanRepository.findById(id)

@@ -19,6 +19,19 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7.0-alpine
+    container_name: meal_plan_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   app:
     build: .
     container_name: meal_plan_app
@@ -30,11 +43,16 @@ services:
       DB_NAME: meal_plan_db
       DB_USERNAME: mealplan_user
       DB_PASSWORD: mealplan_password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
       JWT_SECRET: change-this-secret-key-to-a-secure-secret-and-make-it-long-enough-for-hs256-algorithms-to-work-properly-with-spring-security
       JWT_EXPIRATION: 86400000
     depends_on:
       mysql:
         condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   mysql_data:
+  redis_data:

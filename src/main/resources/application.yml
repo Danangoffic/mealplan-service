@@ -16,6 +16,12 @@ spring:
   flyway:
     enabled: true
     locations: classpath:db/migration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  cache:
+    type: redis
 
 jwt:
   secret: ${JWT_SECRET:change-this-secret-key-to-a-secure-secret-and-make-it-long-enough-for-hs256-algorithms-to-work-properly-with-spring-security}

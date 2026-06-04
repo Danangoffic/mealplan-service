@@ -1,11 +1,11 @@
 package com.example.mealplan.dashboard.service;
 
-import com.example.mealplan.common.util.SecurityUtils;
 import com.example.mealplan.dashboard.dto.DailyProgressResponse;
 import com.example.mealplan.dashboard.dto.WeeklyProgressResponse;
 import com.example.mealplan.mealentry.entity.MealEntry;
 import com.example.mealplan.mealentry.entity.MealStatus;
 import com.example.mealplan.mealentry.repository.MealEntryRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,8 +22,8 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    public DailyProgressResponse getDailyProgress(LocalDate date) {
-        String email = SecurityUtils.getCurrentUserEmail();
+    @Cacheable(value = "dailyProgress", key = "#email + '-' + #date")
+    public DailyProgressResponse getDailyProgress(String email, LocalDate date) {
         List<MealEntry> entries = mealEntryRepository.findByMealPlanUserEmailAndMealPlanPlanDate(email, date);
 
         int totalMeals = entries.size();
@@ -44,7 +44,6 @@ public class DashboardService {
         double completionRate = 0.0;
         if (totalMeals > 0) {
             completionRate = ((double) completedMeals / totalMeals) * 100;
-            // Round to nearest integer or 2 decimal places. Let's round to 2 decimal places.
             completionRate = Math.round(completionRate * 100.0) / 100.0;
         }
 
@@ -59,8 +58,8 @@ public class DashboardService {
     }
 
     @Transactional(readOnly = true)
-    public WeeklyProgressResponse getWeeklyProgress(LocalDate startDate, LocalDate endDate) {
-        String email = SecurityUtils.getCurrentUserEmail();
+    @Cacheable(value = "weeklyProgress", key = "#email + '-' + #startDate + '-' + #endDate")
+    public WeeklyProgressResponse getWeeklyProgress(String email, LocalDate startDate, LocalDate endDate) {
         List<MealEntry> entries = mealEntryRepository.findByMealPlanUserEmailAndMealPlanPlanDateBetween(email, startDate, endDate);
 
         int totalMeals = entries.size();
@@ -81,7 +80,6 @@ public class DashboardService {
         double completionRate = 0.0;
         if (totalMeals > 0) {
             completionRate = ((double) completedMeals / totalMeals) * 100;
-            // Round to 2 decimal places
             completionRate = Math.round(completionRate * 100.0) / 100.0;
         }
 

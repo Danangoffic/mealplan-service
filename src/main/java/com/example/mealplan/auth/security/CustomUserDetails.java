@@ -5,12 +5,19 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 
-public class CustomUserDetails implements UserDetails {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class CustomUserDetails implements UserDetails, Serializable {
+    private static final long serialVersionUID = 1L;
 
-    private final User user;
+    private User user;
+
+    public CustomUserDetails() {
+    }
 
     public CustomUserDetails(User user) {
         this.user = user;
@@ -18,6 +25,10 @@ public class CustomUserDetails implements UserDetails {
 
     public User getUser() {
         return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

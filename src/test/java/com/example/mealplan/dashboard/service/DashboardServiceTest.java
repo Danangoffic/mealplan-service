@@ -5,17 +5,11 @@ import com.example.mealplan.dashboard.dto.WeeklyProgressResponse;
 import com.example.mealplan.mealentry.entity.MealEntry;
 import com.example.mealplan.mealentry.entity.MealStatus;
 import com.example.mealplan.mealentry.repository.MealEntryRepository;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -34,27 +28,7 @@ class DashboardServiceTest {
     @InjectMocks
     private DashboardService dashboardService;
 
-    @BeforeEach
-    void setUp() {
-        mockSecurityContext("danang@mail.com");
-    }
 
-    @AfterEach
-    void tearDown() {
-        SecurityContextHolder.clearContext();
-    }
-
-    private void mockSecurityContext(String email) {
-        Authentication authentication = mock(Authentication.class);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        UserDetails userDetails = mock(UserDetails.class);
-        when(userDetails.getUsername()).thenReturn(email);
-        when(authentication.getPrincipal()).thenReturn(userDetails);
-
-        SecurityContext securityContext = mock(SecurityContext.class);
-        when(securityContext.getAuthentication()).thenReturn(authentication);
-        SecurityContextHolder.setContext(securityContext);
-    }
 
     @Test
     void getDailyProgress_Success() {
@@ -68,7 +42,7 @@ class DashboardServiceTest {
         when(mealEntryRepository.findByMealPlanUserEmailAndMealPlanPlanDate("danang@mail.com", date))
                 .thenReturn(entries);
 
-        DailyProgressResponse response = dashboardService.getDailyProgress(date);
+        DailyProgressResponse response = dashboardService.getDailyProgress("danang@mail.com", date);
 
         assertNotNull(response);
         assertEquals(date, response.getDate());
@@ -85,7 +59,7 @@ class DashboardServiceTest {
         when(mealEntryRepository.findByMealPlanUserEmailAndMealPlanPlanDate("danang@mail.com", date))
                 .thenReturn(Collections.emptyList());
 
-        DailyProgressResponse response = dashboardService.getDailyProgress(date);
+        DailyProgressResponse response = dashboardService.getDailyProgress("danang@mail.com", date);
 
         assertNotNull(response);
         assertEquals(0, response.getTotalMeals());
@@ -111,7 +85,7 @@ class DashboardServiceTest {
         when(mealEntryRepository.findByMealPlanUserEmailAndMealPlanPlanDateBetween("danang@mail.com", start, end))
                 .thenReturn(entries);
 
-        WeeklyProgressResponse response = dashboardService.getWeeklyProgress(start, end);
+        WeeklyProgressResponse response = dashboardService.getWeeklyProgress("danang@mail.com", start, end);
 
         assertNotNull(response);
         assertEquals(start, response.getStartDate());
