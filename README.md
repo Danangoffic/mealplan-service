@@ -12,6 +12,7 @@ A production-grade, clean-layered Spring Boot MVP backend for a Meal Plan tracki
 - **Spring Data JPA** for ORM mapping
 - **Flyway Migration** for database schema management
 - **MySQL 8** for data persistence
+- **Redis 7** for session & dashboard caching
 - **Bean Validation** (Hibernate Validator)
 - **Lombok** to eliminate boilerplate
 - **Swagger UI / SpringDoc OpenAPI** for API documentation
@@ -29,6 +30,7 @@ The codebase is built as a modular monolith following a layered architecture:
 - **entity**: Maps database rows to rich domain model objects.
 - **dto**: Ensures encapsulation of JPA models and handles input validations.
 - **security**: Manages JWT token generation, parsing, filter context, and CORS/CSRF configurations.
+- **config**: Manages caching definitions, Redis managers, and audit/JPA behaviors.
 
 ---
 
@@ -41,6 +43,8 @@ The codebase is built as a modular monolith following a layered architecture:
 | `DB_NAME` | `meal_plan_db` | Target database name |
 | `DB_USERNAME` | `mealplan_user` | MySQL login user |
 | `DB_PASSWORD` | `mealplan_password` | MySQL login password |
+| `REDIS_HOST` | `localhost` | Redis Server host name |
+| `REDIS_PORT` | `6379` | Redis Server port |
 | `JWT_SECRET` | `change-this-secret-key-to-a-secure-secret-and-make-it-long-enough-for-hs256-algorithms-to-work-properly-with-spring-security` | Signing key for JWTs |
 | `JWT_EXPIRATION` | `86400000` | Token expiration duration (in ms) |
 
